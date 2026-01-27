@@ -1,0 +1,102 @@
+<<<<<<< HEAD
+{
+  "memories": [],
+  "manual_memories": [],
+  "realtime_memories": [
+    {
+      "type": "message",
+      "content": "NaÄŤĂ­taj si vĹˇetky sĂşbory v tomto prieÄŤinku. SĂş to sĂşbory pre projekt, pre aplikĂˇciu, ktorĂˇ mĂˇ umoĹľniĹĄ realitnĂ˝m maklĂ©rom zadaĹĄ adresu a vytvoriĹĄ popis okolia, akĂ© sĂş tam pozitĂ­va, a",
+      "added_at": "2026-01-01T05:37:33.727088",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "claude_response",
+      "content": "Vysvetlím ti rozdiel:\n\n**Aktuálny pracovný priečinok (podľa systému):**\n```\nC:\\Users\\petoo\\.gemini\\antigravity\\vibe-scout-ai\n```\n\n**Priečinok, ktorý si spomínal:**\n```\nC:\\Users\\petoo\\.gemini\\antigravi",
+      "added_at": "2026-01-01T05:41:00.099576",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "message",
+      "content": "vloĹľil som sĂşbory, naÄŤĂ­taj aktualny prieÄŤinok vibe-scout-ai",
+      "added_at": "2026-01-01T05:41:00.099726",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "claude_response",
+      "content": "Vytvoril som `CLAUDE.md` súbor. Obsahuje:\n\n- **Prehľad projektu** - čo aplikácia robí\n- **Príkazy** - `npm install`, `npm run dev`, `npm run build`\n- **Nastavenie prostredia** - `.env.local` s Gemini ",
+      "added_at": "2026-01-01T06:27:54.983797",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "message",
+      "content": "check codebase and find problems. suggest plan for working mvp",
+      "added_at": "2026-01-01T06:27:54.983859",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "claude_response",
+      "content": "### **Navrhovaný plán (7 krokov)**\n\n```\n┌─────────────────────────────────────────────────────────────┐\n│  FÁZA 1: KRITICKÉ OPRAVY (bez nich app nefunguje)          │\n├────────────────────────────────",
+      "added_at": "2026-01-01T06:31:24.205125",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "message",
+      "content": "AIzaSyCMmwv72YB2_H418R8WXpcEoZ7Lkt3wEVI - API. find current info online about latest models",
+      "added_at": "2026-01-01T06:31:24.205177",
+      "source": "realtime_capture"
+    }
+  ],
+  "created_at": "2026-01-01T05:37:33.725911",
+  "updated_at": "2026-01-01T06:31:24.205181"
+=======
+{
+  "memories": [],
+  "manual_memories": [],
+  "realtime_memories": [
+    {
+      "type": "message",
+      "content": "NaÄŤĂ­taj si vĹˇetky sĂşbory v tomto prieÄŤinku. SĂş to sĂşbory pre projekt, pre aplikĂˇciu, ktorĂˇ mĂˇ umoĹľniĹĄ realitnĂ˝m maklĂ©rom zadaĹĄ adresu a vytvoriĹĄ popis okolia, akĂ© sĂş tam pozitĂ­va, a",
+      "added_at": "2026-01-01T05:37:33.727088",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "claude_response",
+      "content": "Vysvetlím ti rozdiel:\n\n**Aktuálny pracovný priečinok (podľa systému):**\n```\nC:\\Users\\petoo\\.gemini\\antigravity\\vibe-scout-ai\n```\n\n**Priečinok, ktorý si spomínal:**\n```\nC:\\Users\\petoo\\.gemini\\antigravi",
+      "added_at": "2026-01-01T05:41:00.099576",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "message",
+      "content": "vloĹľil som sĂşbory, naÄŤĂ­taj aktualny prieÄŤinok vibe-scout-ai",
+      "added_at": "2026-01-01T05:41:00.099726",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "claude_response",
+      "content": "Vytvoril som `CLAUDE.md` súbor. Obsahuje:\n\n- **Prehľad projektu** - čo aplikácia robí\n- **Príkazy** - `npm install`, `npm run dev`, `npm run build`\n- **Nastavenie prostredia** - `.env.local` s Gemini ",
+      "added_at": "2026-01-01T06:27:54.983797",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "message",
+      "content": "check codebase and find problems. suggest plan for working mvp",
+      "added_at": "2026-01-01T06:27:54.983859",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "claude_response",
+      "content": "### **Navrhovaný plán (7 krokov)**\n\n```\n┌─────────────────────────────────────────────────────────────┐\n│  FÁZA 1: KRITICKÉ OPRAVY (bez nich app nefunguje)          │\n├────────────────────────────────",
+      "added_at": "2026-01-01T06:31:24.205125",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "message",
+      "content": "AIzaSyCMmwv72YB2_H418R8WXpcEoZ7Lkt3wEVI - API. find current info online about latest models",
+      "added_at": "2026-01-01T06:31:24.205177",
+      "source": "realtime_capture"
+    }
+  ],
+  "created_at": "2026-01-01T05:37:33.725911",
+  "updated_at": "2026-01-01T06:31:24.205181"
+>>>>>>> 74e9494c9093d40776ca4b548dd11a67f768e2a4
+}

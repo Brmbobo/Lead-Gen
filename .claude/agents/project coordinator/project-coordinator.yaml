@@ -1,0 +1,31 @@
+<<<<<<< HEAD
+# Coordinates multi-agent workflows for this project
+name: project-coordinator
+type: coordinator
+description: Coordinates multi-agent workflows for this project
+capabilities:
+  - task-decomposition
+  - agent-routing
+  - context-management
+focus:
+  - code-review
+  - refactoring
+  - documentation
+  - testing
+temperature: 0.3
+=======
+# Coordinates multi-agent workflows for this project
+name: project-coordinator
+type: coordinator
+description: Coordinates multi-agent workflows for this project
+capabilities:
+  - task-decomposition
+  - agent-routing
+  - context-management
+focus:
+  - code-review
+  - refactoring
+  - documentation
+  - testing
+temperature: 0.3
+>>>>>>> 74e9494c9093d40776ca4b548dd11a67f768e2a4

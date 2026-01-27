@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(dir:*)",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_context7_context7__query-docs",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(copy \"C:\\\\Users\\\\petoo\\\\.claude\\\\plans\\\\transient-squishing-naur.md\" \"C:\\\\Users\\\\petoo\\\\Lead-Gen\\\\plans\\\\enterprise-critical-analysis.md\")",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\ndocs: add enterprise plan with critical McKinsey-level analysis\n\n- Original enterprise implementation plan for lead generation\n- Comprehensive critical analysis identifying 23 security vulnerabilities\n- GDPR compliance gaps \\(potential €20M fine risk\\)\n- Google Places ToS risk assessment \\(likely violation\\)\n- Competitive analysis vs Apollo.io, Lemlist, Hunter.io\n- TCO analysis revealing true costs \\($224/mo vs $4-5 planned\\)\n- Production-ready code snippets for enterprise features\n- CI/CD pipeline and Docker security hardening specs\n- 5-phase implementation roadmap \\(~80-100h effort\\)\n\nAgents used: Brainstorming, Writing-Plans, Competitive Analyst,\nResearch Analyst, Backend Developer, Fullstack Developer\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+    ]
+  }
+}
