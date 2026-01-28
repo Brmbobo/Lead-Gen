@@ -1,0 +1,143 @@
+version: "3.8"
+
+services:
+  # ==========================================================================
+  # Lead-Gen Application
+  # ==========================================================================
+  lead-gen:
+    build:
+      context: .
+      target: production
+    container_name: lead-gen
+    restart: unless-stopped
+
+    # Environment configuration
+    env_file:
+      - .env
+
+    environment:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+      - LOG_JSON=true
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+
+    # Security
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:size=100M,mode=1777
+
+    # Volumes for workflows
+    volumes:
+      - ./workflows:/app/workflows:ro
+      - ./output:/app/output:rw
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-c", "from lead_gen.core.config import get_settings; get_settings()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    # Network
+    networks:
+      - lead-gen-network
+
+  # ==========================================================================
+  # Scheduled Workflow Runner
+  # ==========================================================================
+  lead-gen-scheduler:
+    build:
+      context: .
+      target: production
+    container_name: lead-gen-scheduler
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+
+    # Run with cron-like scheduling
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "Lead-Gen Scheduler started"
+        while true; do
+          echo "Checking for scheduled workflows..."
+          # Run workflow if schedule matches (simplified)
+          # In production, use proper cron or external scheduler
+          sleep 3600  # Check every hour
+        done
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+    security_opt:
+      - no-new-privileges:true
+
+    volumes:
+      - ./workflows:/app/workflows:ro
+      - ./output:/app/output:rw
+
+    networks:
+      - lead-gen-network
+
+    depends_on:
+      lead-gen:
+        condition: service_healthy
+
+  # ==========================================================================
+  # Development Container
+  # ==========================================================================
+  lead-gen-dev:
+    build:
+      context: .
+      target: development
+    container_name: lead-gen-dev
+    profiles:
+      - dev
+
+    env_file:
+      - .env
+
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - LOG_JSON=false
+
+    volumes:
+      - ./src:/app/src:rw
+      - ./tests:/app/tests:rw
+      - ./workflows:/app/workflows:rw
+
+    stdin_open: true
+    tty: true
+
+    networks:
+      - lead-gen-network
+
+    command: ["bash"]
+
+networks:
+  lead-gen-network:
+    driver: bridge
+
+volumes:
+  output:
