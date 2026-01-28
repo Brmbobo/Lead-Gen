@@ -363,11 +363,28 @@ class PlacesService:
                 formatted_address=data.get("formattedAddress", ""),
             )
 
+        # Price level mapping (Google Places API v1 returns strings)
+        price_level_map = {
+            "PRICE_LEVEL_FREE": 0,
+            "PRICE_LEVEL_INEXPENSIVE": 1,
+            "PRICE_LEVEL_MODERATE": 2,
+            "PRICE_LEVEL_EXPENSIVE": 3,
+            "PRICE_LEVEL_VERY_EXPENSIVE": 4,
+        }
+        raw_price = data.get("priceLevel")
+        # Handle both string enum and integer values
+        if isinstance(raw_price, str):
+            price_level = price_level_map.get(raw_price)
+        elif isinstance(raw_price, int):
+            price_level = raw_price if 0 <= raw_price <= 4 else None
+        else:
+            price_level = None
+
         # Metrics
         metrics = BusinessMetrics(
             rating=data.get("rating"),
             review_count=data.get("userRatingCount", 0),
-            price_level=data.get("priceLevel"),
+            price_level=price_level,
             user_ratings_total=data.get("userRatingCount", 0),
         )
 

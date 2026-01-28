@@ -182,7 +182,7 @@ class OpenAIService:
             raise SecurityError(
                 "Potential prompt injection detected in lead data",
                 threat_type="prompt_injection",
-                service="openai",
+                operation="generate_message",
             )
 
         # Rate limit

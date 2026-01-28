@@ -487,7 +487,11 @@ class HunterService:
 
         if not domain:
             # Return lead as EnrichedLead without enrichment
-            return EnrichedLead(**lead.model_dump())
+            # Exclude computed fields that shouldn't be passed to constructor
+            lead_data = lead.model_dump(
+                exclude={'display_name', 'has_contact_info', 'quality_score'}
+            )
+            return EnrichedLead(**lead_data)
 
         # Search for emails
         try:
@@ -503,7 +507,11 @@ class HunterService:
                 domain=domain,
                 error=str(e),
             )
-            return EnrichedLead(**lead.model_dump())
+            # Exclude computed fields that shouldn't be passed to constructor
+            lead_data = lead.model_dump(
+                exclude={'display_name', 'has_contact_info', 'quality_score'}
+            )
+            return EnrichedLead(**lead_data)
 
         # Verify emails if requested
         enrichments: list[EmailEnrichment] = []
@@ -514,9 +522,10 @@ class HunterService:
                         email=email_data.email,
                         correlation_id=correlation_id,
                     )
-                    # Update verification status
+                    # Update verification status - exclude existing verified fields
+                    email_dict = email_data.model_dump(exclude={'verified', 'verified_at'})
                     email_data = EmailEnrichment(
-                        **email_data.model_dump(),
+                        **email_dict,
                         verified=verify_result.result == "deliverable",
                         verified_at=datetime.now(timezone.utc),
                     )
@@ -525,9 +534,12 @@ class HunterService:
 
             enrichments.append(email_data)
 
-        # Create enriched lead
+        # Create enriched lead - exclude computed fields
+        lead_data = lead.model_dump(
+            exclude={'display_name', 'has_contact_info', 'quality_score'}
+        )
         enriched = EnrichedLead(
-            **lead.model_dump(),
+            **lead_data,
             enrichments=enrichments,
             enriched_at=datetime.now(timezone.utc),
             enrichment_source="hunter",
@@ -585,8 +597,11 @@ class HunterService:
                     error=str(e),
                     correlation_id=correlation_id,
                 )
-                # Add unenriched lead
-                results.append(EnrichedLead(**lead.model_dump()))
+                # Add unenriched lead - exclude computed fields
+                lead_data = lead.model_dump(
+                    exclude={'display_name', 'has_contact_info', 'quality_score'}
+                )
+                results.append(EnrichedLead(**lead_data))
 
         return results
 
