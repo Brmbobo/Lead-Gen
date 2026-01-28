@@ -240,14 +240,89 @@ COMMIT:
 
 ### Sprint 2.1: API Client Layer
 ```
-Status: [ ] NOT STARTED
-[Waiting for Fáza 1]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SPRINT 2.1: API Client Layer
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Začiatok: 2026-01-29 00:30
+Koniec:   2026-01-29 01:00
+Status:   [x] COMPLETE
+
+AGENT A: Backend API Developer (FastAPI)
+├─ Fokus: REST API endpoints with FastAPI
+├─ Status: [x]
+├─ Úlohy:
+│  ├─ [x] Add FastAPI dependencies to pyproject.toml
+│  ├─ [x] Create src/lead_gen/api/ module structure
+│  ├─ [x] Implement leads routes (CRUD)
+│  ├─ [x] Implement workflows routes
+│  ├─ [x] Implement settings routes
+│  └─ [x] Add CORS and auth middleware
+└─ Výstup: src/lead_gen/api/ (10 files, 47 tests)
+
+AGENT B: Frontend API Client Developer
+├─ Fokus: TypeScript API client
+├─ Status: [x]
+├─ Úlohy:
+│  ├─ [x] Create frontend/lib/api/client.ts
+│  ├─ [x] Create frontend/lib/api/types.ts
+│  ├─ [x] Create frontend/lib/api/errors.ts
+│  ├─ [x] Implement leads API
+│  ├─ [x] Implement workflows API
+│  └─ [x] Implement settings API
+└─ Výstup: frontend/lib/api/ (7 files)
+
+TESTY:
+├─ Test suite: pytest tests/unit/ --cov=src/lead_gen
+├─ Výsledok: 390 passed, 0 failed
+├─ Coverage: 80.54%
+└─ API Tests: 47 new tests
+
+KRITIK C: API Architecture Reviewer
+├─ Status: [x]
+└─ Finálne schválenie: [x]
+
+COMMIT:
+├─ Hash: 7c95332
+├─ Message: "feat: add FastAPI REST API and TypeScript client (Sprint 2.1)"
+└─ Pushed: [ ]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-### Sprint 2.2: State Management
+### Sprint 2.2: State Management & Data Fetching
 ```
-Status: [ ] NOT STARTED
-[Waiting for Sprint 2.1]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SPRINT 2.2: State Management & Data Fetching
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Začiatok: 2026-01-29 01:05
+Koniec:   -
+Status:   [~] IN PROGRESS
+
+AGENT A: Frontend State Developer
+├─ Fokus: React state management with Zustand
+├─ Status: [~]
+├─ Úlohy:
+│  ├─ [ ] Create frontend/lib/store/ structure
+│  ├─ [ ] Implement leads store
+│  ├─ [ ] Implement workflows store
+│  ├─ [ ] Implement settings store
+│  └─ [ ] Create React Query hooks
+└─ Výstup: frontend/lib/store/, frontend/hooks/
+
+AGENT B: Frontend Component Developer
+├─ Fokus: Connect dashboard to real data
+├─ Status: [~]
+├─ Úlohy:
+│  ├─ [ ] Setup QueryClientProvider
+│  ├─ [ ] Refactor StatsCard with API data
+│  ├─ [ ] Refactor RecentActivity with API data
+│  ├─ [ ] Refactor WorkflowCard with API data
+│  └─ [ ] Add loading/error states
+└─ Výstup: frontend/app/, frontend/components/
+
+KRITIK C: Frontend Architecture Reviewer
+├─ Status: [ ]
+└─ Finálne schválenie: [ ]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ---
