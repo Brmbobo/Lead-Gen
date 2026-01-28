@@ -1,0 +1,773 @@
+# Lead-Gen Enterprise Agent Orchestration Configuration
+# Version: 1.0
+# Date: 2026-01-28
+
+name: lead-gen-enterprise-workflow
+description: Complete implementation workflow for Lead-Gen application
+version: "1.0.0"
+
+# =============================================================================
+# GLOBAL CONFIGURATION
+# =============================================================================
+
+config:
+  max_parallel_agents: 4
+  min_review_iterations: 1
+  max_review_iterations: 3
+  escalation_on_failure: human
+  commit_after_phase: true
+  push_after_commit: true
+
+# =============================================================================
+# AGENT DEFINITIONS
+# =============================================================================
+
+agents:
+  # TIER S: Strategic Orchestrators
+  queen_coordinator:
+    path: .claude/agents/hive-mind/queen-coordinator.md
+    tier: S
+    role: primary_orchestrator
+    capabilities:
+      - swarm_coordination
+      - multi_agent_dispatch
+      - workflow_management
+    can_run_parallel_with:
+      - goap_agent
+
+  goap_agent:
+    path: .claude/agents/goal/agent.md
+    tier: S
+    role: strategic_planner
+    capabilities:
+      - goal_decomposition
+      - a_star_planning
+      - state_modeling
+    can_run_parallel_with:
+      - queen_coordinator
+
+  # TIER A: Domain Experts
+  security_architect:
+    path: .claude/agents/architecture-system-design/security-architect.md
+    tier: A
+    role: security_expert
+    capabilities:
+      - threat_modeling
+      - gdpr_compliance
+      - secrets_management
+      - vault_integration
+
+  integration_architect:
+    path: .claude/agents/architecture-system-design/integration-architect.md
+    tier: A
+    role: api_expert
+    capabilities:
+      - api_design
+      - service_contracts
+      - integration_patterns
+
+  legal_advisor:
+    path: .claude/skills/08-business-product/legal-advisor.md
+    tier: A
+    role: compliance_expert
+    capabilities:
+      - gdpr_audit
+      - tos_review
+      - privacy_policy
+
+  performance_engineer:
+    path: .claude/agents/optimization/performance-engineer_v2.md
+    tier: A
+    role: performance_expert
+    capabilities:
+      - optimization
+      - benchmarking
+      - metrics
+
+  # TIER B: Quality Guardians
+  code_reviewer:
+    path: .claude/agents/code-reviewer/code-reviewer.md
+    tier: B
+    role: quality_guardian
+    mandatory: true
+    capabilities:
+      - manual_review
+      - best_practices
+      - architecture_review
+
+  code_analyzer:
+    path: .claude/agents/analysis/code-analyzer.md
+    tier: B
+    role: automated_analysis
+    mandatory: true
+    capabilities:
+      - security_scan
+      - quality_metrics
+      - vulnerability_detection
+
+  production_validator:
+    path: .claude/agents/testing/production-validator.md
+    tier: B
+    role: final_gate
+    mandatory: true
+    capabilities:
+      - release_validation
+      - compliance_check
+      - gate_keeping
+
+  # TIER C: Implementation Workers
+  worker_specialist:
+    path: .claude/agents/hive-mind/worker-specialist.md
+    tier: C
+    role: implementer
+    scalable: true
+    max_instances: 4
+    capabilities:
+      - code_implementation
+      - service_development
+      - task_execution
+
+  code_goal_planner:
+    path: .claude/agents/goal/code-goal-planner.md
+    tier: C
+    role: task_planner
+    capabilities:
+      - task_decomposition
+      - implementation_planning
+
+  database_specialist:
+    path: .claude/agents/analysis/database-specialist.yaml
+    tier: C
+    role: data_expert
+    capabilities:
+      - schema_design
+      - persistence_layer
+
+  # TIER D: Testing Specialists
+  tdd_london_swarm:
+    path: .claude/agents/testing/tdd-london-swarm.md
+    tier: D
+    role: tester
+    capabilities:
+      - unit_testing
+      - integration_testing
+      - e2e_testing
+    coverage_targets:
+      unit: 80
+      integration: 70
+      e2e: 50
+
+  benchmark_suite:
+    path: .claude/agents/optimization/benchmark-suite.md
+    tier: D
+    role: benchmark_specialist
+    capabilities:
+      - performance_baselines
+      - load_testing
+      - regression_detection
+
+  # TIER E: Frontend Specialists
+  enterprise_design_system:
+    path: .claude/agents/enterprise-frontend-design/SKILL.md
+    tier: E
+    role: frontend_lead
+    capabilities:
+      - design_tokens
+      - component_library
+      - ui_ux
+
+  accessibility_agent:
+    path: .claude/agents/enterprise-frontend-design/accessibility/
+    tier: E
+    role: a11y_specialist
+    capabilities:
+      - wcag_compliance
+      - accessibility_audit
+
+  design_iterator:
+    path: .claude/agents/enterprise-frontend-design/design-iterator/
+    tier: E
+    role: design_refinement
+    capabilities:
+      - iterative_design
+      - user_feedback
+
+  performance_agent:
+    path: .claude/agents/enterprise-frontend-design/performance/
+    tier: E
+    role: frontend_performance
+    capabilities:
+      - fcp_optimization
+      - lcp_optimization
+      - cls_reduction
+
+# =============================================================================
+# WORKFLOW PHASES
+# =============================================================================
+
+phases:
+  # ---------------------------------------------------------------------------
+  # PHASE 0: Legal & Security Foundation
+  # ---------------------------------------------------------------------------
+  phase_0:
+    name: "Legal & Security Foundation"
+    description: "GDPR compliance and security architecture"
+    parallel: true
+
+    agents:
+      - agent: legal_advisor
+        tasks:
+          - "GDPR compliance audit"
+          - "Google Places ToS review"
+          - "Legitimate Interest Assessment"
+          - "Privacy Policy draft (SK/CZ/AT)"
+        outputs:
+          - docs/legal/gdpr-compliance-report.md
+          - docs/legal/privacy-policy.md
+
+      - agent: security_architect
+        tasks:
+          - "Design secrets management (AWS Secrets Manager/Vault)"
+          - "Create threat model"
+          - "Define security requirements"
+        outputs:
+          - docs/security/threat-model.md
+          - docs/security/security-requirements.md
+
+    review:
+      agents:
+        - production_validator
+      criteria:
+        - legal_compliance_verified
+        - threat_model_approved
+        - gdpr_plan_ready
+      min_iterations: 1
+
+    commit:
+      message: "docs: add legal and security foundation"
+
+  # ---------------------------------------------------------------------------
+  # PHASE 1: Core Infrastructure
+  # ---------------------------------------------------------------------------
+  phase_1:
+    name: "Core Infrastructure"
+    description: "Config, exceptions, rate limiting, secrets"
+    parallel: true
+    depends_on: [phase_0]
+
+    agents:
+      - agent: integration_architect
+        focus: "API design & service contracts"
+        outputs:
+          - src/lead_gen/core/config.py
+          - src/lead_gen/core/exceptions.py
+          - src/lead_gen/core/rate_limiter.py
+          - src/lead_gen/core/retry.py
+
+      - agent: security_architect
+        focus: "Security infrastructure"
+        outputs:
+          - src/lead_gen/core/secrets.py
+          - src/lead_gen/core/gdpr.py
+          - src/lead_gen/core/sanitization.py
+
+      - agent: worker_specialist
+        focus: "Project setup"
+        outputs:
+          - pyproject.toml
+          - .env.example
+          - src/lead_gen/__init__.py
+
+    review:
+      agents:
+        - code_analyzer
+        - code_reviewer
+        - production_validator
+      checklist:
+        - no_hardcoded_secrets
+        - proper_exception_handling
+        - rate_limiting_implemented
+        - gdpr_fields_present
+        - input_sanitization_complete
+      min_iterations: 1
+
+    commit:
+      message: "feat(core): add infrastructure with security layer"
+
+  # ---------------------------------------------------------------------------
+  # PHASE 2: Domain Models
+  # ---------------------------------------------------------------------------
+  phase_2:
+    name: "Domain Models"
+    description: "Lead, Outreach, Workflow models"
+    parallel: true
+    depends_on: [phase_1]
+
+    agents:
+      - agent: code_goal_planner
+        tasks:
+          - "Design GDPR-compliant domain models"
+          - "Create Pydantic v2 models"
+        outputs:
+          - src/lead_gen/models/lead.py
+          - src/lead_gen/models/outreach.py
+          - src/lead_gen/models/workflow.py
+
+      - agent: database_specialist
+        tasks:
+          - "Design persistence layer"
+          - "Data validation schemas"
+
+    review:
+      agents:
+        - code_analyzer
+        - code_reviewer
+        - tdd_london_swarm
+      coverage_required: 90
+      min_iterations: 1
+
+    commit:
+      message: "feat(models): add GDPR-compliant domain models"
+
+  # ---------------------------------------------------------------------------
+  # PHASE 3: API Services
+  # ---------------------------------------------------------------------------
+  phase_3:
+    name: "API Services"
+    description: "Places, OpenAI, Sheets, Hunter services"
+    parallel: true
+    depends_on: [phase_2]
+
+    agents:
+      - agent: worker_specialist
+        instance: 1
+        service: "Google Places API v1"
+        output: src/lead_gen/services/places_service.py
+
+      - agent: worker_specialist
+        instance: 2
+        service: "OpenAI API"
+        output: src/lead_gen/services/openai_service.py
+
+      - agent: worker_specialist
+        instance: 3
+        service: "Google Sheets"
+        output: src/lead_gen/services/sheets_service.py
+
+      - agent: worker_specialist
+        instance: 4
+        service: "Hunter.io"
+        output: src/lead_gen/services/hunter_service.py
+
+    integration_review:
+      agent: integration_architect
+      validation:
+        - service_contracts_match
+        - error_propagation_correct
+        - circuit_breakers_configured
+
+    performance_review:
+      agent: performance_engineer
+      benchmarks:
+        response_time_ms: 500
+        memory_acceptable: true
+        connection_pooling: true
+
+    review:
+      agents:
+        - code_analyzer
+        - code_reviewer
+        - tdd_london_swarm
+      checklist:
+        - all_services_async
+        - proper_timeout_handling
+        - retry_logic_with_backoff
+        - logging_with_correlation_ids
+        - no_blocking_calls
+      min_iterations: 1
+
+    commit:
+      message: "feat(services): add async API services with resilience"
+
+  # ---------------------------------------------------------------------------
+  # PHASE 4: Tools Layer
+  # ---------------------------------------------------------------------------
+  phase_4:
+    name: "Tools Layer"
+    description: "BaseTool and concrete tools"
+    parallel: true
+    depends_on: [phase_3]
+
+    agents:
+      - agent: goap_agent
+        role: "Orchestrate tool design"
+        planning:
+          - decompose_tool_requirements
+          - define_preconditions_effects
+          - create_execution_graph
+
+      - agent: worker_specialist
+        outputs:
+          - src/lead_gen/tools/base.py
+          - src/lead_gen/tools/scrape_leads.py
+          - src/lead_gen/tools/generate_outreach.py
+          - src/lead_gen/tools/export_to_sheets.py
+          - src/lead_gen/tools/enrich_email.py
+
+    review:
+      agents:
+        - code_analyzer
+        - code_reviewer
+        - production_validator
+      checklist:
+        - base_tool_abstraction_clean
+        - single_responsibility
+        - proper_error_propagation
+        - logging_comprehensive
+      min_iterations: 1
+
+    commit:
+      message: "feat(tools): add modular tool layer"
+
+  # ---------------------------------------------------------------------------
+  # PHASE 5: Workflow Orchestration
+  # ---------------------------------------------------------------------------
+  phase_5:
+    name: "Workflow Orchestration"
+    description: "BaseWorkflow and lead generation workflow"
+    parallel: true
+    depends_on: [phase_4]
+
+    agents:
+      - agent: queen_coordinator
+        role: "Design workflow orchestration"
+        coordination:
+          - multi_step_workflow_design
+          - error_recovery_paths
+          - state_management
+
+      - agent: code_goal_planner
+        outputs:
+          - src/lead_gen/workflows/base.py
+          - src/lead_gen/workflows/lead_generation.py
+          - workflows/slovakia_dentists.yaml
+
+    review:
+      agents:
+        - integration_architect
+        - code_reviewer
+        - tdd_london_swarm
+      e2e_tests:
+        - complete_workflow_execution
+        - partial_failure_recovery
+        - yaml_config_validation
+      min_iterations: 1
+
+    commit:
+      message: "feat(workflows): add orchestration layer"
+
+  # ---------------------------------------------------------------------------
+  # PHASE 6: CLI Interface
+  # ---------------------------------------------------------------------------
+  phase_6:
+    name: "CLI Interface"
+    description: "Click-based command line interface"
+    parallel: false
+    depends_on: [phase_5]
+
+    agents:
+      - agent: worker_specialist
+        outputs:
+          - src/lead_gen/cli.py
+
+    review:
+      agents:
+        - code_reviewer
+        - production_validator
+      validation:
+        - cli_help_text_clear
+        - error_messages_user_friendly
+        - exit_codes_correct
+      min_iterations: 1
+
+    commit:
+      message: "feat(cli): add command-line interface"
+
+  # ---------------------------------------------------------------------------
+  # PHASE 7: Docker Deployment
+  # ---------------------------------------------------------------------------
+  phase_7:
+    name: "Docker Deployment"
+    description: "Secure containerization"
+    parallel: true
+    depends_on: [phase_6]
+
+    agents:
+      - agent: security_architect
+        focus: "Container security"
+        outputs:
+          - Dockerfile
+          - .dockerignore
+
+      - agent: performance_engineer
+        focus: "Optimization"
+        outputs:
+          - docker-compose.yml
+
+    review:
+      agents:
+        - code_analyzer
+        - production_validator
+      security_scan:
+        - trivy_container_scan
+        - no_root_privileges
+        - read_only_filesystem
+      gates:
+        - container_builds_successfully
+        - health_checks_pass
+        - resource_limits_enforced
+        - secrets_not_in_image
+      min_iterations: 1
+
+    commit:
+      message: "feat(deploy): add secure Docker deployment"
+
+  # ---------------------------------------------------------------------------
+  # PHASE 8: Frontend Dashboard (Parallel with Backend)
+  # ---------------------------------------------------------------------------
+  phase_8:
+    name: "Frontend Dashboard"
+    description: "Enterprise dashboard for lead management"
+    parallel: true
+    parallel_with: [phase_3, phase_4, phase_5]
+    depends_on: [phase_0]
+
+    stack:
+      framework: "React/Next.js"
+      styling: "Tailwind CSS + shadcn/ui"
+      charts: "Recharts"
+
+    pages:
+      - name: Dashboard
+        features: [lead_metrics, recent_activity]
+      - name: Lead Browser
+        features: [filter, search, export]
+      - name: Workflow Runner
+        features: [start_stop_workflows]
+      - name: Settings
+        features: [api_keys, preferences]
+      - name: GDPR Center
+        features: [data_export, deletion_requests]
+
+    agents:
+      - agent: enterprise_design_system
+        outputs:
+          - design_tokens
+          - component_library_specification
+          - ui_ux_wireframes
+
+      - agent: accessibility_agent
+        requirements:
+          - wcag_2_1_aa
+          - keyboard_navigation
+          - screen_reader_support
+
+      - agent: design_iterator
+        iterations:
+          - prototype_v1
+          - user_feedback_integration
+          - refinement_v2
+
+    review:
+      agents:
+        - performance_agent
+        - accessibility_agent
+        - code_reviewer
+      metrics:
+        fcp_ms: 1500
+        lcp_ms: 2500
+        cls: 0.1
+        lighthouse_a11y: 95
+      checklist:
+        - responsive_design
+        - dark_mode_support
+        - error_boundaries
+        - loading_states
+        - proper_typescript_types
+      min_iterations: 1
+
+    commit:
+      message: "feat(frontend): add enterprise dashboard"
+
+  # ---------------------------------------------------------------------------
+  # PHASE 9: Testing & CI/CD
+  # ---------------------------------------------------------------------------
+  phase_9:
+    name: "Testing & CI/CD"
+    description: "Comprehensive test suite and automation"
+    parallel: true
+    depends_on: [phase_7, phase_8]
+
+    agents:
+      - agent: tdd_london_swarm
+        coverage_targets:
+          unit: 80
+          integration: 70
+          e2e: 50
+        outputs:
+          - tests/unit/
+          - tests/integration/
+          - tests/e2e/
+          - conftest.py
+
+      - agent: benchmark_suite
+        outputs:
+          - performance_baselines
+          - load_test_scripts
+          - benchmark_reports
+
+      - agent: worker_specialist
+        focus: "CI/CD setup"
+        outputs:
+          - .github/workflows/ci.yml
+          - .github/workflows/deploy.yml
+          - .pre-commit-config.yaml
+
+    review:
+      agents:
+        - production_validator
+      final_gates:
+        - all_tests_pass
+        - coverage_thresholds_met
+        - security_scans_clean
+        - docker_builds_succeed
+        - documentation_complete
+      min_iterations: 1
+
+    commit:
+      message: "feat(testing): add comprehensive test suite and CI/CD"
+
+  # ---------------------------------------------------------------------------
+  # PHASE 10: Final Validation
+  # ---------------------------------------------------------------------------
+  phase_10:
+    name: "Final Validation"
+    description: "Production readiness verification"
+    parallel: false
+    depends_on: [phase_9]
+
+    agents:
+      - agent: production_validator
+        comprehensive_audit:
+          - security_checklist_23_items
+          - gdpr_compliance_verification
+          - performance_benchmarks
+          - documentation_review
+          - deployment_readiness
+
+      - agent: code_analyzer
+        final_scan:
+          - full_codebase_analysis
+          - technical_debt_assessment
+          - architecture_compliance
+
+    approval_required_from:
+      - production_validator: PASS
+      - security_architect: APPROVED
+      - legal_advisor: COMPLIANT
+
+    commit:
+      message: "release: Lead-Gen v1.0.0 - Production Ready"
+
+# =============================================================================
+# REVIEW PIPELINE CONFIGURATION
+# =============================================================================
+
+review_pipeline:
+  default_sequence:
+    - code_analyzer
+    - code_reviewer
+    - production_validator
+
+  escalation:
+    iteration_1: "Agent Review"
+    iteration_2: "Agent Review + More Context"
+    iteration_3: "Agent Review + Human Consultation"
+    iteration_4: "HUMAN INTERVENTION REQUIRED"
+
+  checklists:
+    security:
+      - no_hardcoded_secrets
+      - proper_input_validation
+      - sql_injection_prevention
+      - xss_prevention
+      - csrf_protection
+      - rate_limiting_implemented
+      - auth_authorization_proper
+      - logging_without_sensitive_data
+      - dependencies_vulnerability_free
+      - docker_non_root
+
+    code_quality:
+      - type_hints_on_functions
+      - docstrings_on_public_apis
+      - no_code_duplication
+      - single_responsibility
+      - proper_error_handling
+      - async_await_properly_used
+      - no_blocking_in_async
+      - consistent_naming
+      - reasonable_function_length
+      - comprehensive_unit_tests
+
+    gdpr:
+      - legal_basis_documented
+      - data_minimization
+      - purpose_limitation
+      - storage_limitation
+      - right_to_access
+      - right_to_erasure
+      - consent_management
+      - processing_records
+      - privacy_policy_accessible
+      - dpo_contact_available
+
+# =============================================================================
+# HANDOFF PROTOCOL
+# =============================================================================
+
+handoff:
+  on_phase_complete:
+    1_commit:
+      agent: worker_specialist
+      command: "git add -A && git commit -m '<message>'"
+
+    2_push:
+      agent: worker_specialist
+      command: "git push -u origin <branch>"
+
+    3_notify:
+      agent: swarm_memory_manager
+      action: "Update shared state with completion status"
+
+    4_trigger_review:
+      agent: code_reviewer
+      action: "Initiate review cycle"
+
+    5_next_phase:
+      agent: queen_coordinator
+      action: "Dispatch next phase agents"
+      condition: "review.status == APPROVED"
+
+# =============================================================================
+# EXECUTION METADATA
+# =============================================================================
+
+metadata:
+  created: "2026-01-28"
+  author: "Claude Opus 4.5"
+  total_agents: 47
+  selected_agents: 15
+  max_parallel: 4
+  estimated_phases: 11
+  minimum_review_iterations: 11

@@ -1,0 +1,123 @@
+# Lead-Gen Workflow: Slovakia Dentists
+# Complete lead generation pipeline for Slovak dental clinics
+
+name: slovakia_dentists
+description: Scrape Slovak dentists, enrich with emails, generate outreach, export to Sheets
+version: "1.0"
+tags:
+  - dentists
+  - slovakia
+  - outreach
+  - production
+
+# =============================================================================
+# WORKFLOW STEPS
+# =============================================================================
+
+steps:
+  # ---------------------------------------------------------------------------
+  # Step 1: Scrape Dentists from Google Places
+  # ---------------------------------------------------------------------------
+  - name: scrape_dentists
+    type: scrape
+    scrape_config:
+      query: "zubár"
+      location: "Bratislava, Slovakia"
+      radius_km: 30
+      max_results: 20
+      language: sk
+      region: sk
+      min_rating: 4.0
+      min_reviews: 5
+      business_types:
+        - dentist
+        - dental_clinic
+
+  # ---------------------------------------------------------------------------
+  # Step 2: Filter by Quality
+  # ---------------------------------------------------------------------------
+  - name: filter_quality
+    type: filter
+    filter_config:
+      min_quality_score: 50
+      required_fields:
+        - phone
+      deduplicate_by: phone
+
+  # ---------------------------------------------------------------------------
+  # Step 3: Enrich with Email Addresses
+  # ---------------------------------------------------------------------------
+  - name: enrich_emails
+    type: enrich
+    skip_on_error: true  # Continue even if Hunter fails
+    enrich_config:
+      provider: hunter
+      find_emails: true
+      verify_emails: true
+      max_enrichments_per_lead: 2
+
+  # ---------------------------------------------------------------------------
+  # Step 4: Generate Outreach Messages
+  # ---------------------------------------------------------------------------
+  - name: generate_messages
+    type: generate
+    generate_config:
+      model: gpt-4o-mini
+      language: sk
+      tone: professional
+      temperature: 0.7
+      max_tokens: 500
+      sender_name: "Ján Novák"
+      sender_company: "Lead-Gen s.r.o."
+      sender_email: "jan@lead-gen.sk"
+      sender_phone: "+421 900 123 456"
+      value_proposition: "Pomáhame zubným ambulanciám získať viac pacientov cez moderný online marketing a automatizáciu"
+      call_to_action: "Rád by som Vám predstavil našu ponuku na 15-minútovom hovore"
+
+  # ---------------------------------------------------------------------------
+  # Step 5: Export to Google Sheets
+  # ---------------------------------------------------------------------------
+  - name: export_to_sheets
+    type: export
+    export_config:
+      destination: sheets
+      spreadsheet_id: "YOUR_SPREADSHEET_ID_HERE"  # Replace with actual ID
+      worksheet_name: "Dentists - Bratislava"
+      append_mode: true
+      include_messages: true
+      fields:
+        - name
+        - phone
+        - email
+        - website
+        - address
+        - city
+        - rating
+        - review_count
+        - quality_score
+        - message_subject
+
+# =============================================================================
+# GLOBAL SETTINGS
+# =============================================================================
+
+rate_limits:
+  google_places:
+    requests_per_minute: 60
+  openai:
+    requests_per_minute: 60
+  hunter:
+    requests_per_minute: 30
+  sheets:
+    requests_per_minute: 60
+
+default_retry_policy:
+  max_retries: 3
+  base_delay_seconds: 1.0
+  max_delay_seconds: 30.0
+  exponential_base: 2.0
+
+# Workflow behavior
+stop_on_error: false  # Continue with remaining steps on error
+max_leads: 100  # Global limit
+dry_run: false  # Set to true for testing
