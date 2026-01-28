@@ -81,8 +81,12 @@ class TestEnrichedLeadModel:
             last_name="User",
         )
 
+        # Exclude computed fields when creating EnrichedLead from Lead
+        lead_data = sample_lead.model_dump(
+            exclude={'display_name', 'has_contact_info', 'quality_score'}
+        )
         enriched = EnrichedLead(
-            **sample_lead.model_dump(),
+            **lead_data,
             enrichments=[enrichment],
             enriched_at=datetime.now(timezone.utc),
         )
@@ -99,8 +103,12 @@ class TestEnrichedLeadModel:
             EmailEnrichment(email="mid@example.sk", confidence=60),
         ]
 
+        # Exclude computed fields when creating EnrichedLead from Lead
+        lead_data = sample_lead.model_dump(
+            exclude={'display_name', 'has_contact_info', 'quality_score'}
+        )
         enriched = EnrichedLead(
-            **sample_lead.model_dump(),
+            **lead_data,
             enrichments=enrichments,
         )
 

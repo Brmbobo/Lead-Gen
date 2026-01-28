@@ -76,6 +76,7 @@ PROMPT_INJECTION_PATTERNS = [
     r"\[/INST\]",
     r"<<SYS>>",
     r"<</SYS>>",
+    r"<<<\s*system\s*>>>",  # Generic system delimiter pattern
 ]
 
 # SQL injection patterns
