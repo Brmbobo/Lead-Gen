@@ -1,7 +1,7 @@
 # LEAD-GEN PROGRESS TRACKER
 
 > **Live Status Dashboard**
-> **Posledná aktualizácia:** 2026-01-28 23:50:00
+> **Posledná aktualizácia:** 2026-01-29 00:17:00
 
 ---
 
@@ -16,7 +16,7 @@
 ║                                                                   ║
 ║  Backend:           ████████████████░░░░  82%  ✓ PRODUCTION      ║
 ║  Frontend:          ███░░░░░░░░░░░░░░░░░  15%  ⚠ NEEDS WORK      ║
-║  Testing:           █████████████░░░░░░░  65%  ⚠ IN PROGRESS     ║
+║  Testing:           ████████████████░░░░  82%  ✓ TARGET MET      ║
 ║  Infrastructure:    █████████████░░░░░░░  65%  ⚠ NEEDS POLISH    ║
 ║  Documentation:     ████░░░░░░░░░░░░░░░░  20%  ⚠ NEEDS WORK      ║
 ║                                                                   ║
@@ -35,10 +35,12 @@ Finished: 2026-01-28 23:50
 Results: 193 tests passed, 65% coverage, 4 production bugs fixed
 ```
 
-### Sprint: 1.2 - Workflow & CLI Tests (NEXT)
+### Sprint: 1.2 - Workflow & CLI Tests ✅ COMPLETED
 ```
-Status: PENDING
-Waiting for commit from Sprint 1.1
+Status: COMPLETE
+Started: 2026-01-28 23:55
+Finished: 2026-01-29 00:17
+Results: 343 total tests, 82.42% coverage (target: 80%)
 ```
 
 ---
@@ -170,8 +172,8 @@ TESTY:
    └─ openai_service.py: SecurityError duplicate service param
 
 COMMIT:
-├─ Hash: PENDING
-├─ Message: "test: add comprehensive service layer tests"
+├─ Hash: f38e554
+├─ Message: "test: add comprehensive service and core layer tests (Sprint 1.1)"
 └─ Pushed: [ ]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -181,10 +183,54 @@ COMMIT:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SPRINT 1.2: Workflow & CLI Tests
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Začiatok: -
-Koniec:   -
-Status:   [ ] NOT STARTED
-[Waiting for Sprint 1.1]
+Začiatok: 2026-01-28 23:55
+Koniec:   2026-01-29 00:25
+Status:   [x] COMPLETE
+
+AGENT A: Backend Test Developer (Workflows)
+├─ Fokus: BaseWorkflow, WorkflowRunner, LeadGenWorkflow tests
+├─ Status: [x]
+├─ Úlohy:
+│  ├─ [x] BaseWorkflow tests (run, step execution, error handling)
+│  ├─ [x] WorkflowRunner tests (validation, yaml loading)
+│  ├─ [x] LeadGenWorkflow tests (all step types)
+│  └─ [x] Filter step tests (quality, dedup, status filters)
+└─ Výstup: tests/unit/test_workflows.py (56 tests)
+
+AGENT B: Backend Test Developer (CLI & Tools)
+├─ Fokus: CLI commands, BaseTool, ToolContext, ToolResult tests
+├─ Status: [x]
+├─ Úlohy:
+│  ├─ [x] CLI run command tests
+│  ├─ [x] CLI validate_env tests
+│  ├─ [x] CLI init/version tests
+│  ├─ [x] ToolContext tests
+│  ├─ [x] ToolResult tests
+│  └─ [x] BaseTool tests
+└─ Výstup: tests/unit/test_cli_and_tools.py (66 tests)
+
+KRITIK C: Test Quality Reviewer
+├─ Status: [x]
+├─ Iterácia 1:
+│  ├─ Čas review: 2026-01-29 00:15
+│  ├─ Feedback: All tests passing on first run
+│  └─ Výsledok: APPROVED
+├─ Iterácia 2:
+│  ├─ Čas review: N/A
+│  ├─ Feedback: N/A
+│  └─ Výsledok: N/A
+└─ Finálne schválenie: [x]
+
+TESTY:
+├─ Test suite: pytest tests/unit/ --cov=src/lead_gen
+├─ Výsledok: 343 passed, 0 failed
+├─ Coverage: 65% → 82.42%
+└─ Coverage Target: 80% ✓ EXCEEDED
+
+COMMIT:
+├─ Hash: 137a8fd
+├─ Message: "test: add workflow and CLI tests (Sprint 1.2)"
+└─ Pushed: [ ]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -272,6 +318,7 @@ Dátum       | Backend | Frontend | Celkom  | Tests
 ------------|---------|----------|---------|-------
 2026-01-28  |   39%   |    0%    |  39%    | 25
 2026-01-28  |   65%   |    0%    |  65%    | 193
+2026-01-29  |   82%   |    0%    |  82%    | 343
 [target]    |   80%   |   70%    |  75%    | 300+
 ```
 
