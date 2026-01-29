@@ -88,3 +88,4 @@ output/
 exports/
 *.csv
 *.xlsx
+gdpr_compliance.db
