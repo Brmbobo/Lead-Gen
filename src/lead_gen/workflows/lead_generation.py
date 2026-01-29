@@ -164,8 +164,10 @@ class LeadGenWorkflow(BaseWorkflow):
                     deduped.append(lead)
             filtered_leads = deduped
 
-        # Update context
-        context.leads = filtered_leads
+        # Update context - clear and re-add filtered leads
+        context._leads.clear()
+        for lead in filtered_leads:
+            context.add_lead(lead)
         filtered_count = original_count - len(filtered_leads)
 
         self._logger.info(
