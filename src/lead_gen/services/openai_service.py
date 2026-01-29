@@ -11,6 +11,7 @@ Rate limited with token tracking.
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
@@ -295,6 +296,63 @@ class OpenAIService:
                 )
                 # Continue with other leads
                 continue
+
+        return results
+
+    async def generate_messages_concurrent(
+        self,
+        leads: list[Lead],
+        concurrency_limit: int = 5,
+        **kwargs: Any,
+    ) -> list[GenerationResult]:
+        """
+        Generate messages for multiple leads concurrently.
+
+        This method provides significant performance improvements over sequential
+        batch processing by processing multiple leads in parallel while respecting
+        rate limits.
+
+        Args:
+            leads: List of leads
+            concurrency_limit: Maximum number of concurrent requests (default: 5)
+            **kwargs: Arguments passed to generate_message
+
+        Returns:
+            List of GenerationResults (same order as input leads)
+        """
+        semaphore = asyncio.Semaphore(concurrency_limit)
+
+        async def _generate_with_semaphore(lead: Lead, index: int) -> tuple[int, GenerationResult | None]:
+            """Generate message for a single lead with semaphore control."""
+            async with semaphore:
+                try:
+                    result = await self.generate_message(lead, **kwargs)
+                    return (index, result)
+                except Exception as e:
+                    logger.error(
+                        "concurrent_message_generation_failed",
+                        lead_id=lead.id,
+                        error=str(e),
+                    )
+                    return (index, None)
+
+        # Create tasks for all leads with their original indices
+        tasks = [_generate_with_semaphore(lead, idx) for idx, lead in enumerate(leads)]
+
+        # Execute all tasks concurrently
+        task_results = await asyncio.gather(*tasks, return_exceptions=False)
+
+        # Sort results by original index and filter out None values
+        sorted_results = sorted(task_results, key=lambda x: x[0])
+        results = [result for _, result in sorted_results if result is not None]
+
+        logger.info(
+            "concurrent_message_generation_completed",
+            total_leads=len(leads),
+            successful=len(results),
+            failed=len(leads) - len(results),
+            concurrency_limit=concurrency_limit,
+        )
 
         return results
 

@@ -381,6 +381,7 @@ class PlacesService:
             price_level = None
 
         # Metrics
+
         metrics = BusinessMetrics(
             rating=data.get("rating"),
             review_count=data.get("userRatingCount", 0),
