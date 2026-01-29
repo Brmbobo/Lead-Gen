@@ -10,7 +10,9 @@ Provides a consistent interface for all tools with:
 
 from __future__ import annotations
 
+import sys
 from abc import ABC, abstractmethod
+from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
@@ -42,16 +44,21 @@ class ToolContext:
     Context passed to tool execution.
 
     Contains shared state and configuration for the workflow.
+    Includes bounded collections and memory usage tracking to prevent unbounded growth.
     """
 
     correlation_id: str = field(default_factory=lambda: str(uuid4()))
     dry_run: bool = False
     gdpr_manager: GDPRManager | None = None
 
-    # Shared data between tools
-    leads: list[Any] = field(default_factory=list)
-    messages: list[Any] = field(default_factory=list)
-    enriched_leads: list[Any] = field(default_factory=list)
+    # Shared data between tools (bounded collections)
+    _leads: deque[Any] = field(default_factory=lambda: deque(maxlen=10000))
+    _messages: deque[Any] = field(default_factory=lambda: deque(maxlen=10000))
+    _enriched_leads: deque[Any] = field(default_factory=lambda: deque(maxlen=10000))
+
+    # Memory tracking
+    _max_collection_size: int = 10000
+    _items_dropped: int = 0
 
     # Metrics
     start_time: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
@@ -63,17 +70,68 @@ class ToolContext:
         if self.gdpr_manager is None:
             self.gdpr_manager = get_gdpr_manager()
 
+    @property
+    def leads(self) -> list[Any]:
+        """Get leads as a list."""
+        return list(self._leads)
+
+    @property
+    def messages(self) -> list[Any]:
+        """Get messages as a list."""
+        return list(self._messages)
+
+    @property
+    def enriched_leads(self) -> list[Any]:
+        """Get enriched leads as a list."""
+        return list(self._enriched_leads)
+
     def add_lead(self, lead: Any) -> None:
-        """Add a lead to context."""
-        self.leads.append(lead)
+        """
+        Add a lead to context.
+
+        If collection is at max capacity, oldest item will be dropped.
+        """
+        if len(self._leads) >= self._max_collection_size:
+            self._items_dropped += 1
+            logger.warning(
+                "context_collection_full",
+                collection="leads",
+                max_size=self._max_collection_size,
+                items_dropped=self._items_dropped,
+            )
+        self._leads.append(lead)
 
     def add_message(self, message: Any) -> None:
-        """Add a message to context."""
-        self.messages.append(message)
+        """
+        Add a message to context.
+
+        If collection is at max capacity, oldest item will be dropped.
+        """
+        if len(self._messages) >= self._max_collection_size:
+            self._items_dropped += 1
+            logger.warning(
+                "context_collection_full",
+                collection="messages",
+                max_size=self._max_collection_size,
+                items_dropped=self._items_dropped,
+            )
+        self._messages.append(message)
 
     def add_enriched_lead(self, lead: Any) -> None:
-        """Add an enriched lead to context."""
-        self.enriched_leads.append(lead)
+        """
+        Add an enriched lead to context.
+
+        If collection is at max capacity, oldest item will be dropped.
+        """
+        if len(self._enriched_leads) >= self._max_collection_size:
+            self._items_dropped += 1
+            logger.warning(
+                "context_collection_full",
+                collection="enriched_leads",
+                max_size=self._max_collection_size,
+                items_dropped=self._items_dropped,
+            )
+        self._enriched_leads.append(lead)
 
     def track_api_call(self, tokens: int = 0, cost: float = 0.0) -> None:
         """Track an API call."""
@@ -85,6 +143,51 @@ class ToolContext:
     def elapsed_seconds(self) -> float:
         """Get elapsed time since start."""
         return (datetime.now(timezone.utc) - self.start_time).total_seconds()
+
+    @property
+    def memory_usage_bytes(self) -> int:
+        """
+        Estimate memory usage of collections in bytes.
+
+        Returns approximate memory usage of stored collections.
+        """
+        total_size = 0
+        total_size += sys.getsizeof(self._leads) + sum(sys.getsizeof(item) for item in self._leads)
+        total_size += sys.getsizeof(self._messages) + sum(sys.getsizeof(item) for item in self._messages)
+        total_size += sys.getsizeof(self._enriched_leads) + sum(sys.getsizeof(item) for item in self._enriched_leads)
+        return total_size
+
+    @property
+    def memory_usage_mb(self) -> float:
+        """Get memory usage in megabytes."""
+        return self.memory_usage_bytes / (1024 * 1024)
+
+    def get_collection_stats(self) -> dict[str, Any]:
+        """
+        Get statistics about collections.
+
+        Returns:
+            Dictionary with collection sizes and memory usage stats
+        """
+        return {
+            "leads_count": len(self._leads),
+            "messages_count": len(self._messages),
+            "enriched_leads_count": len(self._enriched_leads),
+            "max_collection_size": self._max_collection_size,
+            "items_dropped": self._items_dropped,
+            "memory_usage_mb": round(self.memory_usage_mb, 2),
+            "memory_usage_bytes": self.memory_usage_bytes,
+        }
+
+    def clear_collections(self) -> None:
+        """Clear all collections to free memory."""
+        self._leads.clear()
+        self._messages.clear()
+        self._enriched_leads.clear()
+        logger.info(
+            "context_collections_cleared",
+            correlation_id=self.correlation_id,
+        )
 
 
 @dataclass

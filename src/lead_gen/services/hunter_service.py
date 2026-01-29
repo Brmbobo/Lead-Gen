@@ -11,9 +11,11 @@ Rate limited with cost tracking.
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
+from urllib.parse import urlparse
 from uuid import uuid4
 
 import httpx
@@ -478,7 +480,6 @@ class HunterService:
         # Extract domain from website
         domain = None
         if lead.website:
-            from urllib.parse import urlparse
             parsed = urlparse(str(lead.website))
             domain = parsed.netloc or parsed.path
             # Remove www. prefix
@@ -520,8 +521,14 @@ class HunterService:
                         verified=verify_result.result == "deliverable",
                         verified_at=datetime.now(timezone.utc),
                     )
-                except APIError:
-                    pass
+                except APIError as e:
+                    logger.debug(
+                        "email_verification_failed",
+                        email=email_data.email[:3] + "***" if email_data.email else None,
+                        error=str(e),
+                        correlation_id=correlation_id,
+                    )
+                    # Continue with unverified email
 
             enrichments.append(email_data)
 
@@ -587,6 +594,76 @@ class HunterService:
                 )
                 # Add unenriched lead
                 results.append(EnrichedLead(**lead.model_dump()))
+
+        return results
+
+    async def enrich_leads_concurrent(
+        self,
+        leads: list[Lead],
+        concurrency_limit: int = 5,
+        verify: bool = True,
+        correlation_id: str | None = None,
+    ) -> list[EnrichedLead]:
+        """
+        Enrich multiple leads with email data concurrently.
+
+        This method provides significant performance improvements over sequential
+        batch processing by processing multiple leads in parallel while respecting
+        rate limits.
+
+        Args:
+            leads: List of leads to enrich
+            concurrency_limit: Maximum number of concurrent requests (default: 5)
+            verify: Whether to verify emails
+            correlation_id: Request correlation ID
+
+        Returns:
+            List of EnrichedLeads (same order as input leads)
+        """
+        correlation_id = correlation_id or str(uuid4())
+        semaphore = asyncio.Semaphore(concurrency_limit)
+
+        async def _enrich_with_semaphore(lead: Lead, index: int) -> tuple[int, EnrichedLead]:
+            """Enrich a single lead with semaphore control."""
+            async with semaphore:
+                try:
+                    enriched = await self.enrich_lead(
+                        lead=lead,
+                        verify=verify,
+                        correlation_id=correlation_id,
+                    )
+                    return (index, enriched)
+                except Exception as e:
+                    logger.error(
+                        "concurrent_lead_enrichment_failed",
+                        lead_id=lead.id,
+                        error=str(e),
+                        correlation_id=correlation_id,
+                    )
+                    # Return unenriched lead on error
+                    return (index, EnrichedLead(**lead.model_dump()))
+
+        # Create tasks for all leads with their original indices
+        tasks = [_enrich_with_semaphore(lead, idx) for idx, lead in enumerate(leads)]
+
+        # Execute all tasks concurrently
+        task_results = await asyncio.gather(*tasks, return_exceptions=False)
+
+        # Sort results by original index to maintain order
+        sorted_results = sorted(task_results, key=lambda x: x[0])
+        results = [enriched for _, enriched in sorted_results]
+
+        # Count successful enrichments
+        enriched_count = sum(1 for lead in results if lead.enrichments)
+
+        logger.info(
+            "concurrent_lead_enrichment_completed",
+            total_leads=len(leads),
+            enriched=enriched_count,
+            failed=len(leads) - enriched_count,
+            concurrency_limit=concurrency_limit,
+            correlation_id=correlation_id,
+        )
 
         return results
 
